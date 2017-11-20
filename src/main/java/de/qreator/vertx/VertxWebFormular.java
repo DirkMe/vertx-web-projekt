@@ -23,48 +23,44 @@ public class VertxWebFormular {
 
         Router router = Router.router(vertx);
 
-        router.route("/").handler(routingContext -> {
-            HttpServerResponse response = routingContext.response();
-            response.putHeader("content-type", "text/plain");
-            response.end("Gib in der Adresszeile den Pfad \"daten\" oder \"produkte/Werkzeuge/Hammer\" oder \"static/index.html\" oder \"static/formular.html\" ein.");
-        });
-
-        
         router.route("/anfrage").handler(routingContext -> {
             String typ = routingContext.request().getParam("typ");
             String name = routingContext.request().getParam("name");
+            String rpw = "abcd";
+            String rbn = "Baum";
+            String passwort = routingContext.request().getParam("passwort");
             HttpServerResponse response = routingContext.response();
             response.putHeader("content-type", "application/json");
             JsonObject jo = new JsonObject();
 
             if (typ.equals("namenKnopf")) {
                 jo.put("typ", "antwort");
-                jo.put("text", "Der Text war " + name);
+                jo.put("text", "Dein Benutzername ist: " + name + "Dein Passwort: " + passwort);
             }
-            response.end(Json.encodePrettily(jo));
-        });
+  
+            if (rpw.equals(passwort)&& rbn.equals(name)) {
+                jo.put("typ","anmeldung");
+                jo.put("istAngemeldet",true);
+                jo.put("text", " Daten sind richtig");
+            } else {
+                jo.put("typ","anmeldung");
+                jo.put("istAngemeldet",false);
+                jo.put("text", "Daten sind falsch");
+            }
+            
+        response.end(Json.encodePrettily(jo));
+    }
+
+    );
 
         // statische html-Dateien werden über den Dateipfad static ausgeliefert
-      
-        router.route("/static/*").handler(StaticHandler.create().setDefaultContentEncoding("UTF-8"));
+    router.route (
 
-        // alle Anfragen, die mit /daten beginnen werden von diesem Handler beantwortet
-        router.route("/daten").handler(routingContext -> {
-            HttpServerResponse response = routingContext.response();
-            response.putHeader("content-type", "text/plain");
-            response.end("Hier eine Nachricht vom Unterpfad \"/daten\"!");
-        });
-
-        // alle Anfragen der Form /produkte/Werkzeuge/Hammer1  werden von diesem Handler beantwortet
-        router.route("/produkte/:produktTyp/:produktID").handler(routingContext -> {
-            String produktTyp = routingContext.request().getParam("produktTyp");
-            String produktID = routingContext.request().getParam("produktID");
-            HttpServerResponse response = routingContext.response();
-            response.putHeader("content-type", "text/plain");
-            response.end("Die ProduktID ist " + produktID + " und der Produkttyp ist " + produktTyp);
-        });
+    "/static/*").handler(StaticHandler.create().setDefaultContentEncoding("UTF-8"));
 
         // router::accept akzeptiert eine Anfrage und leitet diese an den Router weiter
-        server.requestHandler(router::accept).listen(8080);
+    server.requestHandler (router
+
+::accept).listen(8080);
     }
 }
