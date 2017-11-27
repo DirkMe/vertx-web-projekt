@@ -12,6 +12,7 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.StaticHandler;
 
 public class VertxWebFormular {
@@ -41,17 +42,38 @@ public class VertxWebFormular {
             if (rpw.equals(passwort)&& rbn.equals(name)) {
                 jo.put("typ","anmeldung");
                 jo.put("istAngemeldet",true);
-                jo.put("text", " Daten sind richtig");
+                Session session = routingContext.session();
+                session.put("angemeldet", "ja");
             } else {
                 jo.put("typ","anmeldung");
                 jo.put("istAngemeldet",false);
                 jo.put("text", "Daten sind falsch");
             }
             
+            
+            
+            
         response.end(Json.encodePrettily(jo));
-    }
-
-    );
+        });
+        router.route("/session").handler(routingContext -> {
+            String typ = routingContext.request().getParam("typ");
+            HttpServerResponse response = routingContext.response();
+            response.putHeader("content-type", "application/json");
+            JsonObject jo = new JsonObject();
+            if (typ.equals("anfrage")){
+                Session session = routingContext.session();
+                jo.put("typ", "angemeldet");
+                if (session.get("angemeldet")==null){
+                    
+                    jo.put("angemeldet","nein");
+                } else if (session.get("angemeldet").equals("ja")){
+                    
+                    jo.put("angemeldet","ja");
+                }
+                response.end(Json.encodePrettily(jo));
+            }
+        });
+    
 
         // statische html-Dateien werden über den Dateipfad static ausgeliefert
     router.route (
