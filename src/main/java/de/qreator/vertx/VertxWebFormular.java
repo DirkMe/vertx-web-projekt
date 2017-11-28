@@ -23,13 +23,11 @@ public class VertxWebFormular {
 
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
-        
-        
 
         HttpServer server = vertx.createHttpServer();
 
         Router router = Router.router(vertx);
-
+        
         router.route().handler(CookieHandler.create());
 
         SessionStore baum = LocalSessionStore.create(vertx);
@@ -38,11 +36,29 @@ public class VertxWebFormular {
 
         router.route().handler(praktikant);
         
-        
+
         
 
-        router.route("/anfrage").handler(routingContext -> {
+        router.route("/session").handler(routingContext -> {
             String typ = routingContext.request().getParam("typ");
+            HttpServerResponse response = routingContext.response();
+            response.putHeader("content-type", "application/json");
+            JsonObject jo = new JsonObject();
+            if (typ.equals("anfrage")) {
+                Session session = routingContext.session();
+                jo.put("typ", "angemeldet");
+                if (session.get("angemeldet").equals("ja")) {
+
+                    jo.put("angemeldet", "ja");
+                } else if (session.get("angemeldet") == null) {
+
+                    jo.put("angemeldet", "nein");
+                }
+                response.end(Json.encodePrettily(jo));
+            }
+        });
+
+        router.route("/anfrage").handler(routingContext -> {
             String name = routingContext.request().getParam("name");
             String rpw = "b";
             String rbn = "b";
@@ -50,46 +66,28 @@ public class VertxWebFormular {
             HttpServerResponse response = routingContext.response();
             response.putHeader("content-type", "application/json");
             JsonObject jo = new JsonObject();
+            
 
             if (rpw.equals(passwort) && rbn.equals(name)) {
                 jo.put("typ", "anmeldung");
                 jo.put("istAngemeldet", true);
-                 /*Session session = routingContext.session();
+                Session session = routingContext.session();
                 session.put("angemeldet", "ja");
-*/           
-} else {
+
+            } else {
                 jo.put("typ", "anmeldung");
                 jo.put("istAngemeldet", false);
                 jo.put("text", "Daten sind falsch");
+                Session session = routingContext.session();
+                session.put("angemeldet", "nein");
             }
 
             response.end(Json.encodePrettily(jo));
         }
         );
-        
-        
-   /*         router.route("/session").handler(routingContext -> {
-            String typ = routingContext.request().getParam("typ");
-            HttpServerResponse response = routingContext.response();
-            response.putHeader("content-type", "application/json");
-            JsonObject jo = new JsonObject();
-            if (typ.equals("anfrage")){
-                Session session = routingContext.session();
-                jo.put("typ", "angemeldet");
-                if (session.get("angemeldet")==null){
-                    
-                    jo.put("angemeldet","nein");
-                } else if (session.get("angemeldet").equals("ja")){
-                    
-                    jo.put("angemeldet","ja");
-                }
-                response.end(Json.encodePrettily(jo));
-            }
-        });
-*/
-        // statische html-Dateien werden über den Dateipfad static ausgeliefert
-       router.route ("/static/*").handler(StaticHandler.create().setDefaultContentEncoding("UTF-8"));
 
+        // statische html-Dateien werden über den Dateipfad static ausgeliefert
+        router.route("/static/*").handler(StaticHandler.create().setDefaultContentEncoding("UTF-8").setCachingEnabled(false));
         // router::accept akzeptiert eine Anfrage und leitet diese an den Router weiter
         server.requestHandler(router::accept).listen(8080);
     }
