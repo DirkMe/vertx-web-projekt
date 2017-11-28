@@ -1,70 +1,4 @@
-
 $(document).ready(function () {
-      $("body").html('Benutzername: <input type="text" id="eingabeName"/><br>   Passwort: <input type="text" id="eingabePasswort"/><br> <input type="button" id="eingabeKnopf" value="Ok" />');
-                        
-    
-    $.ajax({url:"../session", data:
-                {
-                    typ:"anfrage"
-                },
-                success: function (data) {
-                    if (data.typ=="angemeldet"){
-                        if (data.angemeldet=="ja"){
-                            $("body").html("Du bist schon angemeldet");
-                        } else {
-                              $("body").html('Benutzername: <input type="text" id="eingabeName"/><br>   Passwort: <input type="text" id="eingabePasswort"/><br> <input type="button" id="eingabeKnopf" value="Ok" />');
-                        }
-                    }
-                }
-            });
-    
-    $("#eingabeKnopf").click(function () {
-        $.ajax({url:"../anfrage", data:
-                {
-                        typ: "namenKnopf",
-                        name: $("#eingabeName").val(),
-                        passwort: $("#eingabePasswort").val()
-                },
-                success: function (data) {
-                if (data.typ == "anmeldung") {
-                    if (data.istAngemeldet == true) {
-                        $("body").html("<input type='button' id='logout' value='abmelden'/>");
-
-                    }
-            
-                    }
-                }
-            });
-        });
-    });
-
-
-
-
-
-
-
-/*
- * 
- $(document).ready(function () {
-       $.ajax({url:"../session", data:
-                {
-                    typ:"anfrage"
-                },
-                success: function (data) {
-                    if (data.typ=="angemeldet"){
-                         if (data.angemeldet=="ja"){
-                      
-                        $("body").html("<input type='button' id='logout' value='abmelden'/>");
-
-                        }
-                        } else {
-                        $("body").html('Benutzername: <input type="text" id="eingabeName"/><br>   Passwort: <input type="text" id="eingabePasswort"/><br> <input type="button" id="eingabeKnopf" value="Ok" />');
-
-                        }
-                    }
-                }
-            );
 
 
     $("body").html('Benutzername: <input type="text" id="eingabeName"/><br>   Passwort: <input type="text" id="eingabePasswort"/><br> <input type="button" id="eingabeKnopf" value="Ok" />');
@@ -95,10 +29,31 @@ if (data.typ == "anmeldung") {
         });
     });
 
+
+    });
+
     $(document).on("click", "#logout", function () {
            
                 $("body").html('Benutzername: <input type="text" id="eingabeName"/><br>   Passwort: <input type="text" id="eingabePasswort"/><br> <input type="button" id="eingabeKnopf" value="Ok" />');
+                
     });
-    });
+ 
 
-*/
+/* $(document).ready(function () {   $.ajax({url:"../session", data:
+ {
+ typ:"anfrage"
+ },
+ success: function (data) {
+ if (data.typ=="angemeldet"){
+ if (data.angemeldet=="ja"){
+ $("body").html("<input type='button' id='logout' value='abmelden'/>");
+ } else {
+ $("body").html('Benutzername: <input type="text" id="eingabeName"/><br>   Passwort: <input type="text" id="eingabePasswort"/><br> <input type="button" id="eingabeKnopf" value="Ok" />');
+ 
+ }
+ }
+ }
+ });
+ });
+ 
+ */
